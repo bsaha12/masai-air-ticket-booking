@@ -148,8 +148,8 @@ apiRouter.get("/dashboard", async (req, res) => {
 apiRouter.patch("/dashboard/:id", async (req, res) => {
   try {
     const _id = req.params.id;
-    const payload = req.body;
-    await BookingModel.findByIdAndUpdate({ _id }, payload);
+    const { flightID: flight } = req.body;
+    await BookingModel.findByIdAndUpdate({ _id }, { flight });
     res.status(204).json({ msg: "Booking Details Updated" });
   } catch (error) {
     res.status(500).json({ error });
