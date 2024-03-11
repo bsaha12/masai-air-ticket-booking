@@ -71,7 +71,7 @@ apiRouter.get("/flights", async (req, res) => {
 apiRouter.get("/flights/:id", async (req, res) => {
   try {
     const _id = req.params.id;
-    const flight = FlightModel.findOne({ _id });
+    const flight = await FlightModel.findOne({ _id });
     res.status(200).json({ flight });
   } catch (error) {
     res.status(500).json({ error });
@@ -98,7 +98,7 @@ apiRouter.patch("/flights/:id", async (req, res) => {
   try {
     const _id = req.params.id;
     const payload = req.body;
-    FlightModel.findByIdAndUpdate({ _id }, payload);
+    await FlightModel.findByIdAndUpdate({ _id }, payload);
     res.status(204).json({ msg: "Flight Details Updated" });
   } catch (error) {
     res.status(500).json({ error });
@@ -109,8 +109,8 @@ apiRouter.patch("/flights/:id", async (req, res) => {
 apiRouter.delete("/flights/:id", async (req, res) => {
   try {
     const _id = req.params.id;
-    FlightModel.findByIdAndDelete({ _id });
-    res.status(202).json({ msg: "Flight Details Deleted" });
+    const flight = await FlightModel.findByIdAndDelete({ _id });
+    res.status(202).json({ msg: "Flight Details Deleted", flight });
   } catch (error) {
     res.status(500).json({ error });
   }
@@ -121,9 +121,10 @@ apiRouter.post("/booking", async (req, res) => {
   try {
     const { flightID } = req.body;
     const userID = req.userID;
-    const booking = new BookingModel({ flight: flightID, user: userID });
-    await booking.save();
-    res.status(201).status({ msg: "Booking Completed" });
+    // console.log(flightID, userID);
+    const book = new BookingModel({ user: userID, flight: flightID });
+    await book.save();
+    res.status(201).json({ msg: "Booking Completed" });
   } catch (error) {
     res.status(500).json({ error });
   }
@@ -133,15 +134,12 @@ apiRouter.post("/booking", async (req, res) => {
 apiRouter.get("/dashboard", async (req, res) => {
   try {
     const userID = req.userID;
-    const flights = BookingModel.find({ user: userID });
-    const user = UserModel.findOne({ _id });
-    const flightData = [];
-    flights.forEach(async ({ flight }) => {
-      const curr = await FlightModel.findOne({ _id: flight });
-      flightData.push(curr);
-    });
-    res.status(200).json({ user, flights: flightData });
+    const flights = await BookingModel.find({ user: userID });
+    const user = await UserModel.findOne({ _id: userID });
+    const flightData = await getFlightData(flights);
+    res.status(200).json({ user, flights });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error });
   }
 });
@@ -151,7 +149,7 @@ apiRouter.patch("/dashboard/:id", async (req, res) => {
   try {
     const _id = req.params.id;
     const payload = req.body;
-    BookingModel.findByIdAndUpdate({ _id }, payload);
+    await BookingModel.findByIdAndUpdate({ _id }, payload);
     res.status(204).json({ msg: "Booking Details Updated" });
   } catch (error) {
     res.status(500).json({ error });
@@ -159,10 +157,10 @@ apiRouter.patch("/dashboard/:id", async (req, res) => {
 });
 
 // DELETE  api/dashboard/:id
-apiRouter.patch("/dashboard/:id", async (req, res) => {
+apiRouter.delete("/dashboard/:id", async (req, res) => {
   try {
     const _id = req.params.id;
-    BookingModel.findByIdAndDelete({ _id });
+    await BookingModel.findByIdAndDelete({ _id });
     res.status(202).json({ msg: "Booking Details Deleted" });
   } catch (error) {
     res.status(500).json({ error });
@@ -173,5 +171,15 @@ apiRouter.patch("/dashboard/:id", async (req, res) => {
 apiRouter.use("*", (req, res) => {
   res.status(400).json({ msg: "OOps ! Page Doesn't exist" });
 });
+
+// function to get flight data with flights ids as arguments
+async function getFlightData(flights) {
+  let result = [];
+  flights.forEach(async ({ flight }) => {
+    const curr = await FlightModel.findOne({ _id: flight });
+    result.push(curr);
+  });
+  return result;
+}
 
 module.exports = { apiRouter };
