@@ -136,7 +136,7 @@ apiRouter.get("/dashboard", async (req, res) => {
     const userID = req.userID;
     const flights = await BookingModel.find({ user: userID });
     const user = await UserModel.findOne({ _id: userID });
-    const flightData = await getFlightData(flights);
+    // const flightData = await getFlightData(flights);
     res.status(200).json({ user, flights });
   } catch (error) {
     console.log(error);
