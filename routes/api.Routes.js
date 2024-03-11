@@ -61,7 +61,6 @@ apiRouter.post("/login", async (req, res) => {
 apiRouter.get("/flights", async (req, res) => {
   try {
     const flights = await FlightModel.find();
-    console.log(flights);
     res.status(200).json({ flights });
   } catch (error) {
     res.status(500).json({ error });
@@ -72,16 +71,15 @@ apiRouter.get("/flights", async (req, res) => {
 apiRouter.get("/flights/:id", async (req, res) => {
   try {
     const _id = req.params.id;
-    const flights = FlightModel.findOne({ _id });
-    console.log(flights);
-    res.status(200).json({ msg: "flights" });
+    const flight = FlightModel.findOne({ _id });
+    res.status(200).json({ flight });
   } catch (error) {
     res.status(500).json({ error });
   }
 });
 
 ///<-------------- all the protected routes ----------------->
-// apiRouter.use(auth) ;
+apiRouter.use(auth) ;
 
 // POST /api/flights
 apiRouter.post("/flights", async (req, res) => {
