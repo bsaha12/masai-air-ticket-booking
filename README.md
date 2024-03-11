@@ -1,5 +1,6 @@
 # This is the Ticket booking system here We can book all our flights
 ## A Robust Backend System containing necessary API Endpoints for Frontend
+##### Note: All routes with sample dataset is present in following routes.
 ## Routes
 ###  POST      /api/register
 #### Body : 
@@ -26,8 +27,8 @@ code :- 500
 ###  POST      /api/login
 #### Body : 
 {
-  "email" : String ,
-  "password" : String
+  "email" : "peter" ,
+  "password" : "peter@gmail.com"
 }
 #### Response :
 code :- 201
