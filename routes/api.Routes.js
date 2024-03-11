@@ -79,7 +79,7 @@ apiRouter.get("/flights/:id", async (req, res) => {
 });
 
 ///<-------------- all the protected routes ----------------->
-apiRouter.use(auth) ;
+apiRouter.use(auth);
 
 // POST /api/flights
 apiRouter.post("/flights", async (req, res) => {
@@ -123,6 +123,7 @@ apiRouter.post("/booking", async (req, res) => {
     const userID = req.userID;
     const booking = new BookingModel({ flight: flightID, user: userID });
     await booking.save();
+    res.status(201).status({ msg: "Booking Completed" });
   } catch (error) {
     res.status(500).json({ error });
   }
